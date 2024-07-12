@@ -242,7 +242,29 @@ class main_window(tk.Frame):
 
         #frame_top=tk.Frame(self,parent)
 
+    def load_image_into_numpy_array(self,path):
+        """Load an image from file into a numpy array.
 
+        Puts image into numpy array to feed into tensorflow graph.
+        Note that by convention we put it into a numpy array with shape
+        (height, width, channels), where channels=3 for RGB.
+
+        Args:
+            path: a file path (this can be local or on colossus)
+
+        Returns:
+            uint8 numpy array with shape (img_height, img_width, 3)
+        """
+        # img_data = tf.io.gfile.GFile(path, 'rb').read()
+        # image = Image.open(BytesIO(img_data))
+        image = Image.open(path)
+        (im_width, im_height) = image.size
+
+        if len(np.asarray(image).shape)<3:
+            img_3d = np.expand_dims(image, -1) #last_axis = -1
+            return np.repeat(img_3d, 3, 2).astype('uint8') # repeats=3, dim_to_repeat=2
+        else:
+            return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
 
 
 
